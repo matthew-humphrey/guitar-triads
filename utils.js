@@ -196,13 +196,16 @@ function refreshScale(){
 
 //---------------------------------------
 
-function showNote(board, string, fret, color, noteLabel, ctx) {
+function showNote(board, string, fret, color, noteLabel, ctx, chordRoot) {
 	if(!ctx){
 		ctx = chordCtx
 	}
 	const stringIndex = tuningStrings.length-string;
 	const x = protoBoard.stringSpace*stringIndex+board.x;
 	const y = protoBoard.fretSpace*fret+board.y-protoBoard.fretSpace*.3;
+	
+	// Check if this note matches the chord root
+	const isRootNote = chordRoot && noteLabel === chordRoot;
 	
 	// Draw background circle with same color as string area shading
 	ctx.beginPath();
@@ -211,10 +214,10 @@ function showNote(board, string, fret, color, noteLabel, ctx) {
 	ctx.arc(x,y,12, 0, 6.5, 0);
 	ctx.fill();
 	
-	// Draw the note circle outline
+	// Draw the note circle outline with thicker line for root notes
 	ctx.beginPath();
 	ctx.strokeStyle = color;
-	ctx.lineWidth = 3;
+	ctx.lineWidth = isRootNote ? 5 : 3; // Thicker line for root notes
 	ctx.globalAlpha = 1;
 	ctx.arc(x,y,12, 0, 6.5, 0);
 	ctx.stroke();
@@ -271,9 +274,9 @@ function sketchTriad(board, root, stringSet, inversion, color){
 		let string = tuningStringSets[stringSet][index]
 		let stringPos = tuningStrings[string].indexOf(note)
 		if(smallNotes.length === 3){
-			showNote(board, string+1, notes[index]+12, color, note)	
+			showNote(board, string+1, notes[index]+12, color, note, undefined, root)	
 		}		
-		showNote(board, string+1, notes[index], color, note)
+		showNote(board, string+1, notes[index], color, note, undefined, root)
 	})
 }
 
