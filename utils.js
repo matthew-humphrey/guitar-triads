@@ -189,7 +189,6 @@ function refreshScale(){
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	boards.forEach(board => {
 		board.draw()
-		drawOpenStringNotes(board)
 	})		
 }
 
@@ -197,26 +196,38 @@ function refreshScale(){
 
 //---------------------------------------
 
-function showNote(board, string, fret, color, noteLabel, ctx) {
+function showNote(board, string, fret, color, noteLabel, ctx, chordRoot) {
 	if(!ctx){
 		ctx = chordCtx
 	}
 	const stringIndex = tuningStrings.length-string;
 	const x = protoBoard.stringSpace*stringIndex+board.x;
 	const y = protoBoard.fretSpace*fret+board.y-protoBoard.fretSpace*.3;
+	
+	// Check if this note matches the chord root
+	const isRootNote = chordRoot && noteLabel === chordRoot;
+	
+	// Draw background circle with same color as string area shading
+	ctx.beginPath();
+	ctx.fillStyle = "#f5d4a6"; // Solid color that matches 10% orange over beige background
+	ctx.globalAlpha = 1;
+	ctx.arc(x,y,12, 0, 6.5, 0);
+	ctx.fill();
+	
+	// Draw the note circle outline with thicker line for root notes
 	ctx.beginPath();
 	ctx.strokeStyle = color;
-	ctx.lineWidth = 3;
+	ctx.lineWidth = isRootNote ? 5 : 3; // Thicker line for root notes
 	ctx.globalAlpha = 1;
 	ctx.arc(x,y,12, 0, 6.5, 0);
 	ctx.stroke();
-	if(fret !== 0){
-		ctx.font = '600 12px "Segoe UI", Arial, sans-serif';
-		ctx.fillStyle = protoBoard.colors.noteLabels;
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-		ctx.fillText(noteLabel, x, y);
-	}
+	
+	// Always draw the note label (including for fret 0/open strings)
+	ctx.font = '600 12px "Segoe UI", Arial, sans-serif';
+	ctx.fillStyle = protoBoard.colors.noteLabels;
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(noteLabel, x, y);
 }
 
 function sketchTriad(board, root, stringSet, inversion, color){
@@ -263,9 +274,9 @@ function sketchTriad(board, root, stringSet, inversion, color){
 		let string = tuningStringSets[stringSet][index]
 		let stringPos = tuningStrings[string].indexOf(note)
 		if(smallNotes.length === 3){
-			showNote(board, string+1, notes[index]+12, color, note)	
+			showNote(board, string+1, notes[index]+12, color, note, undefined, root)	
 		}		
-		showNote(board, string+1, notes[index], color, note)
+		showNote(board, string+1, notes[index], color, note, undefined, root)
 	})
 }
 

@@ -1,3 +1,10 @@
+<!--
+  Author: Matthew Humphrey
+  Date: October 2025
+  Based on an original design by Reddit user u/chordtones at: https://triadmapper.vercel.app/
+  Source code available at: https://github.com/matthew-humphrey/guitar-triads
+  License: MIT
+-->
 <!DOCTYPE html>
 <html lang="en">
 	<head>
@@ -11,18 +18,28 @@
 		<div class="top-bar">
 			<div class="control-panel">
 				<div class="control-row">
-					<select id="keyChooser" onchange="updateScaleandTriads()">
-					</select>	
-					<select id="majMinChooser" onchange="updateScaleandTriads()">
-						<option value=0>Major</option>
-						<option value=1>Minor</option>
-					</select>
-					<select id="stringSetChooser" onchange="updateScaleandTriads()">
-						<option value=1>first</option>
-						<option value=2>second</option>
-						<option value=3>third</option>
-						<option value=4>fourth</option>
-					</select>
+					<div class="control-group">
+						<div class="key-controls">
+							<select id="keyChooser" onchange="updateScaleandTriads()">
+							</select>	
+							<select id="majMinChooser" onchange="updateScaleandTriads()">
+								<option value=0>Major</option>
+								<option value=1>Minor</option>
+							</select>
+						</div>
+						<div class="control-label key-label">
+							<span class="bracket-line">└──── key ────┘</span>
+						</div>
+					</div>
+					<div class="control-group">
+						<select id="stringSetChooser" onchange="updateScaleandTriads()">
+							<option value=1>(3-2-1)</option>
+							<option value=2>(4-3-2)</option>
+							<option value=3>(5-4-3)</option>
+							<option value=4>(6-5-4)</option>
+						</select>
+						<div class="control-label">strings</div>
+					</div>
 				</div>
 				<button class="download-btn" onclick="cloneCanvas()">Download</button>
 			</div>
@@ -40,6 +57,10 @@
 		<canvas id="cancan" width = 2000 height = 1000></canvas>
 		<canvas id="chordcan" width = 2000 height = 1000></canvas>
 	</div>
+	
+	<footer class="footer">
+		<p>Created by <a href="https://github.com/matthew-humphrey/guitar-triads" target="_blank" rel="noopener noreferrer">Matthew Humphrey</a>, 2025</p>
+	</footer>
 </html>
 
 <script src="appData.js"></script>
