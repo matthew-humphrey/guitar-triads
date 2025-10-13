@@ -133,6 +133,10 @@ function updateScaleandTriads(){
 	}else{
 		fullTriadSetMinor(keyChooser.options[keyChooser.selectedIndex].text, stringSetChooser.selectedIndex+1)
 	}
+	// Draw open string notes on top of everything else
+	boards.forEach(board => {
+		drawOpenStringNotes(board)
+	})
 	alignLegendToBoards()
 }
 

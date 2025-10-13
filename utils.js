@@ -189,7 +189,6 @@ function refreshScale(){
 	ctx.fillRect(0,0,canvas.width,canvas.height);
 	boards.forEach(board => {
 		board.draw()
-		drawOpenStringNotes(board)
 	})		
 }
 
@@ -204,19 +203,28 @@ function showNote(board, string, fret, color, noteLabel, ctx) {
 	const stringIndex = tuningStrings.length-string;
 	const x = protoBoard.stringSpace*stringIndex+board.x;
 	const y = protoBoard.fretSpace*fret+board.y-protoBoard.fretSpace*.3;
+	
+	// Draw background circle with same color as string area shading
+	ctx.beginPath();
+	ctx.fillStyle = "#f5d4a6"; // Solid color that matches 10% orange over beige background
+	ctx.globalAlpha = 1;
+	ctx.arc(x,y,12, 0, 6.5, 0);
+	ctx.fill();
+	
+	// Draw the note circle outline
 	ctx.beginPath();
 	ctx.strokeStyle = color;
 	ctx.lineWidth = 3;
 	ctx.globalAlpha = 1;
 	ctx.arc(x,y,12, 0, 6.5, 0);
 	ctx.stroke();
-	if(fret !== 0){
-		ctx.font = '600 12px "Segoe UI", Arial, sans-serif';
-		ctx.fillStyle = protoBoard.colors.noteLabels;
-		ctx.textAlign = "center";
-		ctx.textBaseline = "middle";
-		ctx.fillText(noteLabel, x, y);
-	}
+	
+	// Always draw the note label (including for fret 0/open strings)
+	ctx.font = '600 12px "Segoe UI", Arial, sans-serif';
+	ctx.fillStyle = protoBoard.colors.noteLabels;
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(noteLabel, x, y);
 }
 
 function sketchTriad(board, root, stringSet, inversion, color){
