@@ -1,5 +1,95 @@
 console.clear();
 
+const chromaticScale = [
+	"C",
+	"C#",
+	"D",
+	"Eb",
+	"E",
+	"F",
+	"F#",
+	"G",
+	"G#",
+	"A",
+	"Bb",
+	"B",
+	"C",
+	"C#",
+	"D",
+	"Eb",
+	"E",
+	"F",
+	"F#",
+	"G",
+	"G#",
+	"A",
+	"Bb",
+	"B",
+	"C",
+	"C#",
+	"D",
+	"Eb",
+	"E",
+	"F",
+	"F#"
+];
+
+const scales = [
+	[ // major scale
+		0, // 1st
+		2, // 2nd
+		4, // 3rd
+		5, // 4th
+		7, // 5th
+		9, // 6th
+		11, // 7th
+		12 // Octave
+	], 
+	[ // minor scale
+		0, // 1st
+		2, // 2nd
+		3, // flat 3rd
+		5, // 4th
+		7, // 5th
+		8, // flat 6th
+		10, // flat 7th
+		12 // Octave
+	], 
+];
+
+
+const TRIAD_MAJ = 0;
+const TRIAD_MIN = 1;
+const TRIAD_DIM = 2;
+const TRIAD_AUG = 3;
+const TRIAD_SUS2 = 4;
+const TRIAD_SUS4 = 5;
+
+const triads = [
+	[0, 4, 7], // maj
+	[0, 3, 7], // min
+	[0, 3, 6], // dim
+	[ 0, 4, 8 ] // aug
+	[ 0, 2, 7 ], // sus2
+	[ 0, 5, 7 ], // sus4
+];
+
+const tuningStrings = [
+	chromaticScale.slice(4, 4 + 16),
+	chromaticScale.slice(11, 11 + 16),
+	chromaticScale.slice(7, 7 + 16),
+	chromaticScale.slice(2, 2 + 16),
+	chromaticScale.slice(9, 9 + 16),
+	chromaticScale.slice(4, 4 + 16),
+];
+
+const tuningStringSets = [
+		[2,1,0],
+		[3,2,1],
+		[4,3,2],
+		[5,4,3],
+	];
+
 
 const canvas = document.getElementById("cancan");
 const container = document.getElementById("container");
@@ -46,10 +136,6 @@ for (let index = 0; index < 12; index++) {
 keyChooser.selectedIndex = 7;
 majMinChooser.selectedIndex = 0;
 
-const ACTIVE_TUNING_INDEX = 0;
-const tuningStrings = stringNotes[ACTIVE_TUNING_INDEX];
-const tuningStringSets = stringSets[ACTIVE_TUNING_INDEX];
-
 let protoBoard = {
 	width: BOARD_WIDTH,
 	height: BOARD_HEIGHT,
@@ -69,12 +155,11 @@ let protoBoard = {
 	}
 };
 
-function getScale(root, majOrMin, parts){
+function getScale(root, majOrMin){
 	let start = chromaticScale.indexOf(root);
 	let newScale = [];
-	newScale.push(root);
-	for (let i = 0; i < steps[majOrMin][parts].length; i++) {
-		newScale.push(chromaticScale[start + steps[majOrMin][parts][i]]);
+	for (let i = 0; i < scales[majOrMin].length; i++) {
+		newScale.push(chromaticScale[start + scales[majOrMin][i]]);
 	}	
 	return newScale;
 };
@@ -280,27 +365,29 @@ function sketchTriad(board, root, stringSet, inversion, color){
 	})
 }
 
+function calculateInversion(notes, inversion) {
+  // Ensure inversion is within [0, 2]
+  if (inversion < 0 || inversion > 2) {
+    throw new Error("Inversion must be an integer between 0 and 2");
+  }
+
+  // Copy the array to avoid mutating the input
+  const rotated = notes.slice();
+
+  // Perform the rotation to the right
+  for (let i = 0; i < inversion; i++) {
+    rotated.unshift(rotated.pop());
+  }
+
+  return rotated;
+}
+
 function sketchMajorTriad(board, stringSet, root, inversion, color) {	
-	let inversions = [
-		[0, 4, 7],
-		[7, 0, 4],
-		[4, 7, 0]
-	];
-	sketchTriad(board, root, stringSet, inversions[inversion], color)
+	sketchTriad(board, root, stringSet, calculateInversion(triads[TRIAD_MAJ], inversion), color)
 }
 function sketchMinorTriad(board, stringSet, root, inversion, color) {	
-	let inversions = [
-		[0, 3, 7],
-		[7, 0, 3],
-		[3, 7, 0]
-	];
-	sketchTriad(board, root, stringSet, inversions[inversion], color)
+	sketchTriad(board, root, stringSet, calculateInversion(triads[TRIAD_MIN], inversion), color)
 }
 function sketchDimChord(board, stringSet, root, inversion, color) {	
-	let inversions = [
-		[0, 3, 6],
-		[6, 0, 3],
-		[3, 6, 0]
-	];
-	sketchTriad(board, root, stringSet, inversions[inversion], color)
+	sketchTriad(board, root, stringSet, calculateInversion(triads[TRIAD_DIM], inversion), color)
 }

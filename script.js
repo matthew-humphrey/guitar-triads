@@ -56,7 +56,7 @@ function highLightSet(start, num){
 
 
 function fullTriadSetMajor(key, set){	
-	let scale = getScale(key,0,0)
+	let scale = getScale(key,0)
 	keyChooser.selectedIndex = chromaticScale.indexOf(key);
 	highLightSet(set,3)
 	scale.pop()
@@ -90,7 +90,7 @@ function fullTriadSetMajor(key, set){
 	ctx.textAlign = "center";
 }
 function fullTriadSetMinor(key, set){	
-	let scale = getScale(key,1,0)
+	let scale = getScale(key,1)
 	keyChooser.selectedIndex = chromaticScale.indexOf(key);
 	highLightSet(set,3)
 	scale.pop()
