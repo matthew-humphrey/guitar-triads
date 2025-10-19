@@ -1,41 +1,9 @@
-console.clear();
-
-const chromaticScale = [
-	"C",
-	"C#",
-	"D",
-	"Eb",
-	"E",
-	"F",
-	"F#",
-	"G",
-	"G#",
-	"A",
-	"Bb",
-	"B",
-	"C",
-	"C#",
-	"D",
-	"Eb",
-	"E",
-	"F",
-	"F#",
-	"G",
-	"G#",
-	"A",
-	"Bb",
-	"B",
-	"C",
-	"C#",
-	"D",
-	"Eb",
-	"E",
-	"F",
-	"F#"
+const NoteNames = [
+	"A", "Bb", "B", "C", "C#", "D", "Eb", "E", "F", "F#", "G", "G#"
 ];
 
-const scales = [
-	[ // major scale
+const Scales = {
+    "maj": 	[ 
 		0, // 1st
 		2, // 2nd
 		4, // 3rd
@@ -45,7 +13,8 @@ const scales = [
 		11, // 7th
 		12 // Octave
 	], 
-	[ // minor scale
+
+    "min": 	[ 
 		0, // 1st
 		2, // 2nd
 		3, // flat 3rd
@@ -55,339 +24,231 @@ const scales = [
 		10, // flat 7th
 		12 // Octave
 	], 
-];
-
-
-const TRIAD_MAJ = 0;
-const TRIAD_MIN = 1;
-const TRIAD_DIM = 2;
-const TRIAD_AUG = 3;
-const TRIAD_SUS2 = 4;
-const TRIAD_SUS4 = 5;
-
-const triads = [
-	[0, 4, 7], // maj
-	[0, 3, 7], // min
-	[0, 3, 6], // dim
-	[ 0, 4, 8 ] // aug
-	[ 0, 2, 7 ], // sus2
-	[ 0, 5, 7 ], // sus4
-];
-
-const tuningStrings = [
-	chromaticScale.slice(4, 4 + 16),
-	chromaticScale.slice(11, 11 + 16),
-	chromaticScale.slice(7, 7 + 16),
-	chromaticScale.slice(2, 2 + 16),
-	chromaticScale.slice(9, 9 + 16),
-	chromaticScale.slice(4, 4 + 16),
-];
-
-const tuningStringSets = [
-		[2,1,0],
-		[3,2,1],
-		[4,3,2],
-		[5,4,3],
-	];
-
-
-const canvas = document.getElementById("cancan");
-const container = document.getElementById("container");
-
-const BOARD_WIDTH = 160;
-const BOARD_HEIGHT = 520;
-const HORIZONTAL_GAP = 24;
-const VERTICAL_GAP = 80;
-const TOP_MARGIN = 100;
-const BOTTOM_MARGIN = 90;
-
-const rect = container.getBoundingClientRect();
-canvas.width = rect.width;
-canvas.height = rect.height;
-const ctx = canvas.getContext("2d");
-
-const backCanvas = document.getElementById("backcan");
-const backCtx = backCanvas.getContext("2d");
-backCanvas.width = rect.width;
-backCanvas.height = rect.height;
-
-const chordCanvas = document.getElementById("chordcan");
-chordCanvas.width = rect.width;
-chordCanvas.height = rect.height;
-const chordCtx = chordCanvas.getContext("2d");
-chordCtx.textBaseline = "middle";
-chordCtx.textAlign = "center";
-
-
-ctx.textBaseline = "middle";
-ctx.textAlign = "center";
-ctx.fillStyle = "#cac8c5"
-ctx.fillRect(0,0,canvas.width,canvas.height)
-
-const keyChooser = document.getElementById("keyChooser");
-const majMinChooser = document.getElementById("majMinChooser");
-const stringSetChooser = document.getElementById("stringSetChooser");
-for (let index = 0; index < 12; index++) {
-	keyChooser.options[keyChooser.options.length] = new Option(
-		chromaticScale[index],
-		index
-	);
-}
-keyChooser.selectedIndex = 7;
-majMinChooser.selectedIndex = 0;
-
-let protoBoard = {
-	width: BOARD_WIDTH,
-	height: BOARD_HEIGHT,
-	stringSpace: BOARD_WIDTH/tuningStrings.length,
-	fretSpace: BOARD_HEIGHT/15,
-	colors: {
-		fretboard: "beige",
-		dots: "lightgrey",
-		roots: "darkgrey",
-		shadowDots: "green",
-		shadowRoots: "blue",
-		frets: "brown",
-		strings: "darkblue",
-		fretNums: "grey",
-		notes: "#8e8888",
-		noteLabels: "#555555"
-	}
 };
 
-function getScale(root, majOrMin){
-	let start = chromaticScale.indexOf(root);
-	let newScale = [];
-	for (let i = 0; i < scales[majOrMin].length; i++) {
-		newScale.push(chromaticScale[start + scales[majOrMin][i]]);
-	}	
-	return newScale;
+StandardTuning = ["E", "A", "D", "G", "B", "E"];
+DropDTuning = ["D", "A", "D", "G", "B", "E"];
+DropCTuning = ["C", "G", "C", "F", "A", "D"];
+DropBTuning = ["B", "F#", "B", "E", "G#", "C#"];
+DropATuning = ["A", "E", "A", "D", "F#", "B"];
+OpenDTuning = ["D", "A", "D", "F#", "A", "D"];
+OpenGTuning = ["D", "G", "D", "G", "B", "D"];
+OpenETuning = ["E", "B", "E", "G#", "B", "E"];
+OpenATuning = ["E", "A", "E", "A", "C#", "E"];
+OpenCTuning = ["C", "G", "C", "G", "C", "E"];
+OpenDmTuning = ["D", "A", "D", "F", "A", "D"];
+
+StringSets = {
+    "(3-2-1)": [0,1,2],
+    "(4-3-2)": [1,2,3],
+    "(5-4-3)": [2,3,4],
+    "(6-5-4)": [3,4,5],
+    "(6-4-3)": [2,3,5],
+    "(5-4-2)": [1,3,4],
+    "(4-3-1)": [0,2,3],
 };
 
-function makeFretboard(x,y){
-	let b = {}
-	b.x = x
-	b.y = y	
-	b.draw = ()=>{
-		ctx.lineWidth = 0.5;
-	ctx.globalAlpha = 1;
-	ctx.fillStyle = protoBoard.colors.fretboard;
-	ctx.fillRect(
-		b.x - protoBoard.stringSpace / 2,
-		b.y,
-		protoBoard.width,
-		protoBoard.height
-	);
-	ctx.drawImage(backCanvas, 0, 0);
-	ctx.strokeStyle = protoBoard.colors.strings;
-	for (let i = 0; i <= tuningStrings.length-1; i++) {		
-		ctx.beginPath();
-		ctx.moveTo(b.x + protoBoard.stringSpace * i, b.y);
-		ctx.lineTo(b.x + protoBoard.stringSpace * i, b.y + protoBoard.height);
-		ctx.stroke();
-	}
-	ctx.strokeStyle = protoBoard.colors.frets;
-	let boldFrets = [0,3,5,7,9,12]
+Tunings = {
+    "Standard": StandardTuning,
+    "Drop D": DropDTuning,
+    "Drop C": DropCTuning,
+    "Drop B": DropBTuning,
+    "Drop A": DropATuning,
+    "Open D": OpenDTuning,
+    "Open G": OpenGTuning,
+    "Open E": OpenETuning,
+    "Open A": OpenATuning,
+    "Open C": OpenCTuning,
+    "Open Dm": OpenDmTuning
+};
 
-	for (let i = 0; i <= 15; i++) {
-		ctx.beginPath();
-		if(boldFrets.indexOf(i) > -1 ){
-			ctx.lineWidth = 1.5
-		}else{
-			ctx.lineWidth = .5
-		}
-		ctx.moveTo(
-			b.x- protoBoard.stringSpace / 2,
-			b.y + protoBoard.fretSpace * i
-		);
-		ctx.lineTo(
-			b.x + protoBoard.width - protoBoard.stringSpace / 2,
-			b.y + protoBoard.fretSpace * i
-		);
-		ctx.stroke();
-	}
-	ctx.fillStyle = protoBoard.colors.fretNums;
-	ctx.font = '600 16px "Segoe UI", Arial, sans-serif';
-	["3", "5", "7", "9", "12"].forEach((num) => {
-		ctx.fillText(
-			num,
-			b.x - 1.1 * protoBoard.stringSpace,
-			b.y + protoBoard.fretSpace * num
-		);
-	});
-	}
-	return b
-}
+TriadTypes = {
+	"maj": [0, 4, 7],
+	"min": [0, 3, 7],
+	"dim": [0, 3, 6],
+	"aug": [0, 4, 8],
+	"sus2": [0, 2, 7],
+	"sus4": [0, 5, 7],
+};
 
-function drawOpenStringNotes(board){
-	tuningStrings.forEach((string, index)=>{
-		const openNote = string[0];
-		const str = tuningStrings.length-1-index;
-		const x = protoBoard.stringSpace*str+board.x;
-		const y = board.y - protoBoard.fretSpace*0.3;
-			ctx.font = '600 12px "Segoe UI", Arial, sans-serif';
-			ctx.fillStyle = protoBoard.colors.noteLabels;
-			ctx.fillText(openNote, x, y);
-	});
-}
+function wrappedIndexOf(arr, value, startIndex) {
+  if (!Array.isArray(arr) || arr.length === 0) return -1;
 
-const boards = Array.from({ length: 7 }, () => makeFretboard(0, 0));
+  const len = arr.length;
+  const normalizedStart = ((startIndex % len) + len) % len; // handles negative or huge values
 
-function layoutBoards(){
-	const rect = container.getBoundingClientRect();
-	const containerWidth = Math.max(rect.width, BOARD_WIDTH);
-	protoBoard.stringSpace = protoBoard.width / tuningStrings.length;
-	protoBoard.fretSpace = protoBoard.height / 15;
-	let boardsPerRow = Math.min(boards.length, Math.max(1, Math.floor((containerWidth + HORIZONTAL_GAP) / (protoBoard.width + HORIZONTAL_GAP))));
-	if (boardsPerRow < 1) {
-		boardsPerRow = 1;
-	}
-	const totalRowWidth = boardsPerRow * protoBoard.width + (boardsPerRow - 1) * HORIZONTAL_GAP;
-	const startX = Math.max((containerWidth - totalRowWidth) / 2, 0);
-	boards.forEach((board, index) => {
-		const row = Math.floor(index / boardsPerRow);
-		const col = index % boardsPerRow;
-		const left = startX + col * (protoBoard.width + HORIZONTAL_GAP);
-		board.x = left + protoBoard.stringSpace / 2;
-		board.y = TOP_MARGIN + row * (protoBoard.height + VERTICAL_GAP);
-	});
-	const rows = Math.ceil(boards.length / boardsPerRow);
-	const canvasHeight = TOP_MARGIN + rows * protoBoard.height + Math.max(0, rows - 1) * VERTICAL_GAP + BOTTOM_MARGIN;
-	const canvasWidth = containerWidth;
-	[canvas, backCanvas, chordCanvas].forEach((c) => {
-		c.width = canvasWidth;
-		c.height = canvasHeight;
-		const context = c.getContext("2d");
-		context.clearRect(0, 0, c.width, c.height);
-		c.style.width = `${canvasWidth}px`;
-		c.style.height = `${canvasHeight}px`;
-	});
-	ctx.textBaseline = "middle";
-	ctx.textAlign = "center";
-	chordCtx.textBaseline = "middle";
-	chordCtx.textAlign = "center";
-	container.style.height = `${canvasHeight}px`;
-}
-
-function refreshScale(){
-	ctx.fillStyle = "#cac8c5";
-	ctx.fillRect(0,0,canvas.width,canvas.height);
-	boards.forEach(board => {
-		board.draw()
-	})		
-}
-
-
-
-//---------------------------------------
-
-function showNote(board, string, fret, color, noteLabel, ctx, chordRoot) {
-	if(!ctx){
-		ctx = chordCtx
-	}
-	const stringIndex = tuningStrings.length-string;
-	const x = protoBoard.stringSpace*stringIndex+board.x;
-	const y = protoBoard.fretSpace*fret+board.y-protoBoard.fretSpace*.3;
-	
-	// Check if this note matches the chord root
-	const isRootNote = chordRoot && noteLabel === chordRoot;
-	
-	// Draw background circle with same color as string area shading
-	ctx.beginPath();
-	ctx.fillStyle = "#f5d4a6"; // Solid color that matches 10% orange over beige background
-	ctx.globalAlpha = 1;
-	ctx.arc(x,y,12, 0, 6.5, 0);
-	ctx.fill();
-	
-	// Draw the note circle outline with thicker line for root notes
-	ctx.beginPath();
-	ctx.strokeStyle = color;
-	ctx.lineWidth = isRootNote ? 5 : 3; // Thicker line for root notes
-	ctx.globalAlpha = 1;
-	ctx.arc(x,y,12, 0, 6.5, 0);
-	ctx.stroke();
-	
-	// Always draw the note label (including for fret 0/open strings)
-	ctx.font = '600 12px "Segoe UI", Arial, sans-serif';
-	ctx.fillStyle = protoBoard.colors.noteLabels;
-	ctx.textAlign = "center";
-	ctx.textBaseline = "middle";
-	ctx.fillText(noteLabel, x, y);
-}
-
-function sketchTriad(board, root, stringSet, inversion, color){
-	stringSet -= 1
-	let notes = []
-	inversion.forEach((inversion, index)=>{
-		let npos = chromaticScale.indexOf(root) + inversion
-		let note = chromaticScale[npos]		
-		let string = tuningStringSets[stringSet][index]
-		let stringPos = tuningStrings[string].indexOf(note)		
-		notes.push(stringPos)
-	})
-	let smallNotes = notes.filter(e => e<4)
-	let largeNotes = notes.filter(e => e>6)
-	
-	//fix 2 low 1 high
-	inversion.forEach((inver, index)=>{
-		if(smallNotes.length === 2 && largeNotes.length ===1){
-			smallNotes.forEach((note, ii)=>{
-				if(note < 5){
-					smallNotes[ii] += 12
-					notes[ii] += 12
-				}
-			})
-		}
-	})
-
-	//fix 1 low 2 high
-	inversion.forEach((inver, index)=>{
-		if(smallNotes.length === 1 && largeNotes.length ===2){
-			smallNotes.forEach((note, ii)=>{
-				if(note < 5){
-					smallNotes[smallNotes.indexOf(note)] += 12
-					notes[notes.indexOf(note)] += 12
-				}
-			})
-		}
-	})
-	
-	smallNotes = notes.filter(n => n < 4)
-	inversion.forEach((inversion, index)=>{
-		let npos = chromaticScale.indexOf(root) + inversion
-		let note = chromaticScale[npos]
-		let string = tuningStringSets[stringSet][index]
-		let stringPos = tuningStrings[string].indexOf(note)
-		if(smallNotes.length === 3){
-			showNote(board, string+1, notes[index]+12, color, note, undefined, root)	
-		}		
-		showNote(board, string+1, notes[index], color, note, undefined, root)
-	})
-}
-
-function calculateInversion(notes, inversion) {
-  // Ensure inversion is within [0, 2]
-  if (inversion < 0 || inversion > 2) {
-    throw new Error("Inversion must be an integer between 0 and 2");
+  for (let i = 0; i < len; i++) {
+    const idx = (normalizedStart + i) % len;
+    if (arr[idx] === value) {
+      // return the result offset by the original startIndex
+      return startIndex + i;
+    }
   }
 
-  // Copy the array to avoid mutating the input
-  const rotated = notes.slice();
-
-  // Perform the rotation to the right
-  for (let i = 0; i < inversion; i++) {
-    rotated.unshift(rotated.pop());
-  }
-
-  return rotated;
+  throw new Error("Value not found");
 }
 
-function sketchMajorTriad(board, stringSet, root, inversion, color) {	
-	sketchTriad(board, root, stringSet, calculateInversion(triads[TRIAD_MAJ], inversion), color)
+function findChromaticIndex(note, startIndex = 0) {
+    return wrappedIndexOf(NoteNames, note, startIndex);
 }
-function sketchMinorTriad(board, stringSet, root, inversion, color) {	
-	sketchTriad(board, root, stringSet, calculateInversion(triads[TRIAD_MIN], inversion), color)
+
+function findNoteOffsetFromRoot(root, noteOffset) {
+    const rootIndex = findChromaticIndex(root);
+    const offsetIndex = rootIndex + noteOffset;
+    const len = NoteNames.length;
+    const normalizedIndex = ((offsetIndex % len) + len) % len; // handles negative or huge values
+
+    return NoteNames[normalizedIndex];
 }
-function sketchDimChord(board, stringSet, root, inversion, color) {	
-	sketchTriad(board, root, stringSet, calculateInversion(triads[TRIAD_DIM], inversion), color)
+
+// Given a tuning, a string index, and a fret number, return the note at that position
+function getNoteNameAtPosition(tuning, stringIndex, fret) {
+    const openNote = tuning[tuning.length - stringIndex - 1];
+    const openNoteIndex = findChromaticIndex(openNote);
+    const noteIndex = openNoteIndex + fret;
+    const len = NoteNames.length;
+    const normalizedIndex = ((noteIndex % len) + len) % len; // handles negative or huge values
+
+    return NoteNames[normalizedIndex];
+}
+
+function getScale(root, scaleType) {
+	const scaleIntervals = Scales[scaleType];
+
+	let scale = [];
+	for (let i = 0; i < scaleIntervals.length; i++) {
+		const note = findNoteOffsetFromRoot(root, scaleIntervals[i]);
+		scale.push(note);
+	}
+
+	return scale;
+}
+
+function getOffsetsFromTuning(tuning) {
+	const offsets = [];
+    let noteIndex = 0;
+	for (let i = 0; i < tuning.length; i++) {
+		const note = tuning[i];
+		noteIndex = findChromaticIndex(note, noteIndex);
+		offsets.unshift(noteIndex);
+	}
+	return offsets;
+}
+
+// Takes triad offsets in lowest string to highest string order and:
+// 1. Inverts it according to the inversion parameter
+// 2. Normalizes it so that the notes are in ascending order
+// 3. Reverses it to highest string to lowest string order
+function invertAndNormalizeTriad(notes, inversion = 0, open = false) {
+
+    if (notes.length !== 3) {
+        throw new Error("Triad must have exactly 3 notes");
+    }
+
+    let triad = [];
+    for (let i = inversion; i < inversion + notes.length; i++) {
+        const idx = i % notes.length;
+        triad.push(notes[idx]);
+    }
+
+    if (open) {
+        // Swap Elements 1 and 2
+        let temp = triad[1];
+        triad[1] = triad[2];
+        triad[2] = temp;
+    }
+
+    let previousNote = -1;
+    for (let i = 0; i < triad.length; i++) {
+        let note = triad[i];
+
+        while (note < previousNote) {
+            note += 12;
+        }
+        previousNote = note;
+
+        triad[i] = note;
+    }
+
+    return triad.reverse();
+}
+
+function findTriads(root, triadType, strings, inversion = 0, open = false, tuning = StandardTuning, fretBoardLength = 16) {
+    triads = [];
+
+    const baseTriad = TriadTypes[triadType];
+
+    if (!baseTriad) {
+        throw new Error("Invalid triad type");
+    }
+
+    // Assert that strings.length == 3
+    if (strings.length !==  3) {
+        throw new Error("Invalid input");
+    }
+
+    // Assert that strings are in ascending order, no duplicates
+    for (let i = 1; i < strings.length; i++) {
+        if (strings[i] <= strings[i - 1]) {
+            throw new Error("Strings must be in ascending order with no duplicates");
+        }
+    }
+
+    notes = invertAndNormalizeTriad(baseTriad, inversion, open);
+
+    // Find the lowest note. This is the note on the lowest string.
+    const lowestNote = findNoteOffsetFromRoot(root, notes[notes.length - 1]);
+
+    // Find the lowest string
+    const lowestString = strings[strings.length - 1];
+
+    // Get the absolute tuning offsets for the selected tuning
+    const tuningOffsets = getOffsetsFromTuning(tuning);
+
+    // Find the lowest fret for this lowest note. We may have to move this up an octave later.
+    const lowestStringOffset = tuningOffsets[lowestString];
+    let lowestNoteOffset = findChromaticIndex(lowestNote, lowestStringOffset);
+    if (lowestNoteOffset === -1) {
+        throw new Error("Lowest note not found on specified string");
+    }
+
+    // Adjust all note offsets relative to the lowest note
+    const adjustedNotes = notes.map(note => {
+        return note - notes[notes.length - 1];
+    });
+
+    // Calculate the absolute note offsets for all triad notes, using the lowest note as a base
+    let noteOffsets = adjustedNotes.map(note => {
+        return note + lowestNoteOffset;
+    });
+
+    // Now turn these values into fret numbers. We need the index and value for the next step.
+    let fretNumbers = noteOffsets.map((value, index) => {
+        const stringIndex = strings[index];
+        const stringOffset = tuningOffsets[stringIndex];
+        return value - stringOffset;
+    });
+
+    // If any of the fret numbers are negative, we need to move the entire triad up an octave
+    const minFret = Math.min(...fretNumbers);
+    if (minFret < 0) {
+        const octaveOffset = 12;
+        fretNumbers = fretNumbers.map(fret => fret + octaveOffset);
+    }
+
+    // If any of the fret numbers exceed the fret board length, we cannot play this triad here
+    const maxFret = Math.max(...fretNumbers);
+    if (maxFret < fretBoardLength) {
+        triads.push(fretNumbers);
+
+        // Set if we can also play the triad one octave higher
+        const octaveOffset = 12;
+        const fretNumbersOctaveHigher = fretNumbers.map(fret => fret + octaveOffset);
+        const maxFretOctave = Math.max(...fretNumbersOctaveHigher);
+        if (maxFretOctave < fretBoardLength) {
+            triads.push(fretNumbersOctaveHigher);
+        }
+    }
+
+    return triads;
 }
