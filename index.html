@@ -1,7 +1,7 @@
 <!--
   Author: Matthew Humphrey
   Date: October 2025
-  Based on an original design by Reddit user u/chordtones at: https://triadmapper.vercel.app/
+  Based on an original idea by Reddit user u/chordtones at: https://triadmapper.vercel.app/
   Source code available at: https://github.com/matthew-humphrey/guitar-triads
   License: MIT
 -->
@@ -32,24 +32,27 @@
 						</div>
 					</div>
 					<div class="control-group">
+						<select id="typeChooser" onchange="updateScaleandTriads()">
+						</select>
+						<div class="control-label">type</div>
+					</div>
+					<div class="control-group">
 						<select id="stringSetChooser" onchange="updateScaleandTriads()">
-							<option value=1>(3-2-1)</option>
-							<option value=2>(4-3-2)</option>
-							<option value=3>(5-4-3)</option>
-							<option value=4>(6-5-4)</option>
 						</select>
 						<div class="control-label">strings</div>
 					</div>
+					<div class="control-group">
+						<select id="tuningChooser" onchange="updateScaleandTriads()">
+						</select>
+						<div class="control-label">tuning</div>
+					</div>
 				</div>
-				<button class="download-btn" onclick="cloneCanvas()">Download</button>
-			</div>
-			<div class="title-area">
-				<div id="selectionSummary" aria-live="polite"></div>
+				<button class="download-btn" onclick="download()">Download</button>
 			</div>
 			<div class="legend" aria-label="Triad inversion legend">
-				<div class="legend-item legend-root">root position (1,3,5)</div>
-				<div class="legend-item legend-first">1st inversion (3,5,1)</div>
-				<div class="legend-item legend-second">2nd inversion (5,1,3)</div>
+				<div class="legend-item legend-root">root position</div>
+				<div class="legend-item legend-first">1st inversion</div>
+				<div class="legend-item legend-second">2nd inversion</div>
 			</div>
 		</div>
 	<div id="container">
@@ -64,4 +67,5 @@
 </html>
 
 <script src="triads.js"></script>
+<script src="fretboard.js"></script>
 <script src="script.js"></script>
